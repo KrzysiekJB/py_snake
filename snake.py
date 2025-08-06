@@ -2,8 +2,8 @@ import pygame
 import random
 import time
 
-SCREEN_WIDTH = 500
-SCREEN_HEIGHT = 500
+SCREEN_WIDTH = 300
+SCREEN_HEIGHT = 300
 
 # defining colors
 black = pygame.Color(0, 0, 0)
@@ -46,6 +46,17 @@ def show_score(score, color, font, size):
     score_surface = score_font.render('Score : ' + str(score), True, color)
     score_rect = score_surface.get_rect()
     screen.blit(score_surface, score_rect)
+
+def game_over():
+    my_font = pygame.font.SysFont('times new roman', 30)
+    game_over_surface = my_font.render('Your Score is : ' + str(score), True, red)
+    game_over_rect = game_over_surface.get_rect()
+    game_over_rect.midtop = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 4)
+    screen.blit(game_over_surface, game_over_rect)
+    pygame.display.flip()
+    time.sleep(2)
+    pygame.quit()
+    quit()
 
 run = True
 while run:
@@ -90,7 +101,7 @@ while run:
                          pygame.Rect(pos[0], pos[1], tail_size, tail_size))
     
     if snake_position[0] == fruit_position[0] and snake_position[1] == fruit_position[1]:
-        score += tail_size
+        score += 1
         fruit_spawn = False
     else:
         snake_body.pop()
@@ -103,6 +114,18 @@ while run:
     pygame.draw.rect(screen, white, pygame.Rect(
         fruit_position[0], fruit_position[1], tail_size, tail_size))
     
+    # Game Over contition
+    if snake_position[0] < 0 or snake_position[0] > SCREEN_WIDTH - tail_size:
+        game_over()
+    if snake_position[1] < 0 or snake_position[1] > SCREEN_HEIGHT - tail_size:
+        game_over()
+
+    # Touching the snake body
+    for block in snake_body[1:]:
+        if snake_position[0] == block[0] and snake_position[1] == block[1]:
+            game_over()
+
+    show_score(score, white,'times new roman', 20)
     pygame.display.update()
     clock.tick(snake_speed)
 pygame.quit()
